@@ -1,0 +1,112 @@
+### 1. Public Register (normal user registration)
+POST http://localhost:5000/api/auth/register-public
+Content-Type: application/json
+
+{
+  "name": "Abhishek Raj",
+  "username": "abhishek123",
+  "email": "abhi993146@gmail.com",
+  "password": "Password@123"
+}
+
+
+
+### 2. Create User (Admin/Manager/Developer only - needs token)
+POST http://localhost:5000/api/auth/create-user
+Content-Type: application/json
+Authorization: Bearer {{"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YmM4OTlhMTgzMzNhYWE5MTIxOTM3YiIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3NTcxODcwNTMsImV4cCI6MTc1NzE4Nzk1M30.-xIWa2Z7ecq1dTD8R26XgDwvjNLWD2GxZ9-wOsuqLGg"}}
+
+{
+  "name": "Test Manager",
+  "username": "manager1",
+  "email": "manager@example.com",
+  "password": "Manager@123",
+  "role": "admin"
+}
+
+
+
+### 3. Login Step 1 (generate OTP)
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "abhishek123",
+  "password": "Password@123"
+}
+
+
+### Developer Login
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "infocodrexa@gmail.com",
+  "password": "Dev@AC{}"
+}
+
+
+### Admin Login
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "identifier": "rupakkumar995554@gmail.com",
+  "password": "rupak@123"
+}
+
+
+
+### 4. Verify OTP (login step 2 -> tokens issue hoga)
+POST http://localhost:5000/api/auth/verify-otp
+Content-Type: application/json
+
+{
+  "userId": "68bd47bb0f82b2c10a7363f2", 
+  "otp": "545345"
+}
+
+# Response me milega accessToken + refresh cookie
+
+
+
+### 5. Refresh Token (get new accessToken using refresh cookie)
+POST http://localhost:5000/api/auth/refresh
+
+---
+
+### 6. Forgot Password (send reset link)
+POST http://localhost:5000/api/auth/forgot-password
+Content-Type: application/json
+
+{
+  "identifier": "abhi993146@gmail.com"
+}
+
+
+
+### 7. Reset Password (use reset token from email link)
+POST http://localhost:5000/api/auth/reset-password
+Content-Type: application/json
+
+{
+  "token": "RESET_TOKEN_FROM_EMAIL",
+  "newPassword": "NewPass@123"
+}
+
+---
+
+### 8. Change Password (only logged in)
+POST http://localhost:5000/api/auth/change-password
+Content-Type: application/json
+# Authorization: Bearer {{ACCESS_TOKEN}}
+
+{
+  "oldPassword": "Password@123",
+  "newPassword": "NewPass@123"
+}
+
+---
+
+### 9. Logout
+POST http://localhost:5000/api/auth/logout
