@@ -6,6 +6,7 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import Property from "./routes/propertyRoutes.js";
 import Notepad from "./routes/notepadRoutes.js";
+import FollowUp from "./routes/followUpRoutes.js"
 
 dotenv.config();
 connectDB();
@@ -54,8 +55,10 @@ app.use("/api/auth", authRoutes);
 app.use("/api/property",Property);
 
 // Notepad routes
-
 app.use("/api/notes",Notepad)
+
+// followUp routes
+app.use("/api/followups",FollowUp)
 
 // Global error handler (basic)
 app.use((err, req, res, next) => {

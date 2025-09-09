@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import historySchema from "./History";
+import historySchema from "./History.js";
 // FollowUp Schema
 const followUpSchema = new mongoose.Schema(
   {
