@@ -9,6 +9,17 @@ Content-Type: application/json
   "password": "Password@123"
 }
 
+### 1. Public Register (normal user registration)
+POST http://localhost:5000/api/auth/register-public
+Content-Type: application/json
+
+{
+  "name": "Ramlal Raj",
+  "username": "ram123",
+  "email": "ramlaljha4@gmail.com",
+  "password": "Password@123"
+}
+
 
 
 ### 2. Create User (Admin/Manager/Developer only - needs token)
@@ -62,8 +73,8 @@ POST http://localhost:5000/api/auth/verify-otp
 Content-Type: application/json
 
 {
-  "userId": "68bd47bb0f82b2c10a7363f2", 
-  "otp": "545345"
+  "userId": "68bdcf4c6f741a139ee4e0b4", 
+  "otp": "936571"
 }
 
 # Response me milega accessToken + refresh cookie
@@ -73,7 +84,7 @@ Content-Type: application/json
 ### 5. Refresh Token (get new accessToken using refresh cookie)
 POST http://localhost:5000/api/auth/refresh
 
----
+
 
 ### 6. Forgot Password (send reset link)
 POST http://localhost:5000/api/auth/forgot-password

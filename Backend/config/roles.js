@@ -24,7 +24,7 @@ rolePermissions structure:
 */
 export const rolePermissions = {
   developer: {
-    canCreate: ["*",],
+    canCreate: ["*"],
     canDelete: ["*"],
     canUpdate: ["*"]
   },
@@ -32,19 +32,21 @@ export const rolePermissions = {
     canCreate: [
       "manager","team_leader","executive","telemarketer","bdm",
       "office_boy","sales_executive","bdo","project_incharge",
-      "project_manager","bde","hr_manager","user"
+      "project_manager","bde","hr_manager","user","followups",
+      "property","events", "invoices", "notifications",
     ],
     canDelete: [
       "manager","team_leader","executive","telemarketer","bdm",
       "office_boy","sales_executive","bdo","project_incharge",
-      "project_manager","bde","hr_manager","user","property"
+      "project_manager","bde","hr_manager","user","property",
+      "followups","events", "invoices", "notifications",
     ],
     canUpdate: ["*"]
   },
   manager: {
-    canCreate: ["team_leader","executive","telemarketer","sales_executive","office_boy"],
+    canCreate: ["team_leader","executive","telemarketer","sales_executive","office_boy","followups","property","notifications"],
     canDelete: [],
-    canUpdate: ["team_leader","executive","telemarketer","sales_executive","office_boy"]
+    canUpdate: ["team_leader","executive","telemarketer","sales_executive","office_boy","followups","property"]
   },
   team_leader: {
     canCreate: ["executive","telemarketer"],

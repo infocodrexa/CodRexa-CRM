@@ -1,12 +1,21 @@
-import { rolePermissions, ROLES } from "../config/roles.js"; // path adjust करो
+import { rolePermissions } from "../config/roles.js";
 
-export const followUpPermission = (action) => {
+/**
+ * Middleware to check if logged-in user can perform action on FollowUps
+ * action: "create" | "update" | "delete"
+ */
+export const followUpPermission = (action = "create") => {
   return (req, res, next) => {
     if (!req.user || !req.user.role) {
       return res.status(401).json({ message: "Unauthorized: user not found" });
     }
 
-    const userRole = req.user.role.toLowerCase();
+    const userRole = req.user.role.toLowerCase(); // lowercase
+    const permissions = rolePermissions[userRole];
+
+    if (!permissions) {
+      return res.status(403).json({ message: "No permissions configured for this role" });
+    }
 
     // Map action to rolePermissions key
     let permissionKey;
@@ -20,41 +29,20 @@ export const followUpPermission = (action) => {
       case "delete":
         permissionKey = "canDelete";
         break;
-      case "read":
-      case "export":
-        // For read/export, allow roles that can create or update followups (customize if needed)
-        permissionKey = "canReadExport";
-        break;
       default:
         return res.status(400).json({ message: "Invalid action" });
     }
 
-    // Read/Export: dynamic check from rolePermissions
-    if (permissionKey === "canReadExport") {
-      const allowedRoles = Object.keys(rolePermissions).filter(
-        (r) =>
-          rolePermissions[r].canCreate.includes("*") ||
-          rolePermissions[r].canCreate.length > 0 ||
-          rolePermissions[r].canUpdate.includes("*") ||
-          rolePermissions[r].canUpdate.length > 0
-      );
-      if (!allowedRoles.includes(userRole)) {
-        return res.status(403).json({ message: `Not authorized to ${action} followups` });
-      }
-      return next();
-    }
+    const allowed = permissions[permissionKey]; // now this will be defined
 
-    const rolePerm = rolePermissions[userRole];
-    if (!rolePerm) {
-      return res.status(403).json({ message: `Role '${userRole}' not found in permissions` });
-    }
-
-    const allowed = rolePerm[permissionKey];
-    if (!allowed || allowed.length === 0) {
+    if (!allowed || !Array.isArray(allowed)) {
       return res.status(403).json({ message: `Not authorized to ${action} followups` });
     }
 
-    if (allowed.includes("*") || allowed.includes(userRole)) return next();
+    // ✅ check "*" or userRole or "followups"
+    if (allowed.includes("*") || allowed.includes(userRole) || allowed.includes("followups")) {
+      return next();
+    }
 
     return res.status(403).json({ message: `Not authorized to ${action} followups` });
   };

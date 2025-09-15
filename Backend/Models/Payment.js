@@ -1,65 +1,53 @@
 import mongoose from "mongoose";
 
+const taxSchema = new mongoose.Schema(
+  { name: String, percentage: Number, amount: Number },
+  { _id: false }
+);
+
+const paymentAttachmentSchema = new mongoose.Schema(
+  { fileName: String, fileUrl: String, uploadedAt: { type: Date, default: Date.now } },
+  { _id: false }
+);
+
 const paymentSchema = new mongoose.Schema(
   {
-    invoice: { type: mongoose.Schema.Types.ObjectId, ref: "Invoice" }, // kis invoice se linked hai
-    lead: { type: mongoose.Schema.Types.ObjectId, ref: "Lead" }, // kis lead/customer se related hai
+    invoice: { type: mongoose.Schema.Types.ObjectId, ref: "Invoice" },
+    lead: { type: mongoose.Schema.Types.ObjectId, ref: "Lead" },
 
-    amount: { type: Number, required: true }, // total amount
-    currency: { type: String, default: "INR" }, // INR, USD, EUR, etc.
+    amount: { type: Number, required: true },
+    currency: { type: String, default: "INR" },
 
     method: {
       type: String,
-      enum: [
-        "Cash",
-        "Bank Transfer",
-        "UPI",
-        "Card",
-        "Cheque",
-        "Wallet",
-        "NetBanking",
-        "Other",
-      ],
+      enum: ["Cash","Bank Transfer","UPI","Card","Cheque","Wallet","NetBanking","Other"],
       required: true,
     },
 
     status: {
       type: String,
-      enum: [
-        "Pending",
-        "Completed",
-        "Failed",
-        "Refunded",
-        "Partially Paid",
-        "Cancelled",
-      ],
+      enum: ["Pending","Completed","Failed","Refunded","Partially Paid","Cancelled"],
       default: "Pending",
     },
 
-    transactionId: { type: String }, // Bank/UPI/PG transaction ID
-    referenceNumber: { type: String }, // cheque no, UTR, ref no etc.
-    gateway: { type: String }, // Razorpay, Stripe, PayPal, Paytm, etc.
+    transactionId: { type: String },
+    referenceNumber: { type: String },
+    gateway: { type: String },
 
     paymentDate: { type: Date, default: Date.now },
-    dueDate: { type: Date }, // agar credit hai to due date
+    dueDate: { type: Date },
 
-    receivedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // kisne receive kiya
-    approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // kisne approve kiya (finance/admin)
+    receivedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+    approvedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
 
     notes: { type: String },
 
-    taxes: [
-      {
-        name: String, // GST, VAT, Service Tax
-        percentage: Number,
-        amount: Number,
-      },
-    ],
+    taxes: { type: [taxSchema], default: [] },
 
     discounts: {
       type: {
         type: String,
-        enum: ["Flat", "Percentage"],
+        enum: ["Flat","Percentage"],
       },
       value: Number,
       reason: String,
@@ -79,15 +67,15 @@ const paymentSchema = new mongoose.Schema(
       refundTransactionId: { type: String },
     },
 
-    attachments: [
-      {
-        fileName: String,
-        fileUrl: String,
-        uploadedAt: { type: Date, default: Date.now },
-      },
-    ],
+    attachments: { type: [paymentAttachmentSchema], default: [] },
   },
   { timestamps: true }
 );
 
-export default paymentSchema;
+paymentSchema.index({ lead: 1 });
+paymentSchema.index({ invoice: 1 });
+paymentSchema.index({ status: 1 });
+paymentSchema.index({ paymentDate: -1 });
+
+const Payment = mongoose.model("Payment", paymentSchema);
+export default Payment;

@@ -18,21 +18,23 @@ const historySchema = new mongoose.Schema(
         "NotificationSent",
         "PermissionChanged",
         "DocumentUploaded",
-        "NoteAdded"
+        "NoteAdded",
+        "EventCreated",
+        "EventUpdated",
+        "EventCancelled"
       ],
       required: true,
     },
     description: { type: String }, // free text (details of what changed)
     updatedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" }, // kisne kiya
-    relatedTo: { type: mongoose.Schema.Types.ObjectId, refPath: "onModel" }, // kis entity pe (lead, invoice, followup, group…)
+    relatedTo: { type: mongoose.Schema.Types.ObjectId, refPath: "onModel" }, // polymorphic ref id
     onModel: {
       type: String,
-      enum: ["Lead", "FollowUp", "Invoice", "Group", "Payment"],
+      enum: ["Lead", "FollowUp", "Invoice", "Group", "Payment", "Event", "User"],
     },
     updatedAt: { type: Date, default: Date.now },
   },
-  { timestamps: true }
+  { _id: false, timestamps: true }
 );
-
 
 export default historySchema;

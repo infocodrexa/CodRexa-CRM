@@ -2,7 +2,7 @@ import express from "express";
 import {
   publicRegister, createUser, loginStep1, verifyOTP,
   forgotPassword, resetPassword, changePassword, refreshToken, logout,
-  getUserTree, deleteUser, updateUser
+  getUserTree, deleteUser, updateUser,getAssignableUsers
 } from "../Controllers/authController.js";
 import { protect } from "../Middleware/authMiddleware.js";
 import { checkPermission } from "../Middleware/permissionMiddleware.js";
@@ -36,6 +36,9 @@ router.get("/:id/tree", protect, getUserTree);
 
 //Update user 
 router.put("/:id", protect, updateUser);
+
+//all assign user 
+router.get("/assignable-users", protect, getAssignableUsers);
 
 //delete user 
 router.delete("/:id", protect, deleteUser);
