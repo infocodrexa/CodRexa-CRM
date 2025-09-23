@@ -8,29 +8,34 @@ import Forbidden from "./pages/Forbidden";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import ProtectedRoute from "./components/ProtectedRoute";
+import NotificationBell from "./NotificationBell";
 
 function App() {
   return (
     <AuthProvider>
       <Router>
         <Routes>
-          <Route path="/login" element={<Login />} />
+          {/* <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/otp-verify" element={<OtpVerify />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} /> */}
 
           {/* Protected route with role-based access */}
-          <Route
+          {/* <Route
             path="/dashboard"
             element={
               <ProtectedRoute role={["Developer", "Admin", "Manager", "User"]}>
                 <Dashboard />
               </ProtectedRoute>
             }
-          />
+          /> */}
 
-          <Route path="/forbidden" element={<Forbidden />} />
+          {/* <Route path="/forbidden" element={<Forbidden />} />
+          <Route path="/notification" element={<NotificationBell />} /> */}
+
+          <div>Helo world</div>
+
         </Routes>
       </Router>
     </AuthProvider>
