@@ -1,0 +1,17 @@
+export const ROLES = {
+  DEVELOPER: "developer",
+  ADMIN: "admin",
+  MANAGER: "manager",
+  TEAM_LEADER: "team_leader",
+  EXECUTIVE: "executive",
+  TELEMARKETER: "telemarketer",
+  BDM: "bdm",
+  OFFICE_BOY: "office_boy",
+  SALES_EXECUTIVE: "sales_executive",
+  BDO: "bdo",
+  PROJECT_INCHARGE: "project_incharge",
+  PROJECT_MANAGER: "project_manager",
+  BDE: "bde",
+  HR_MANAGER: "hr_manager",
+  USER: "user",
+};

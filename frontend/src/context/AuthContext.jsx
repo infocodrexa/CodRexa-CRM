@@ -1,21 +1,38 @@
-import { createContext, useState, useEffect } from "react";
-import API from "../services/api";
+import React, { createContext, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
+  const [user, setUser] = useState(() => {
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
+    }
+  });
 
   useEffect(() => {
-    API.get("/auth/me")
-      .then((res) => setUser(res.data.user))
-      .catch(() => setUser(null))
-      .finally(() => setLoading(false));
-  }, []);
+    if (user) localStorage.setItem("user", JSON.stringify(user));
+    else localStorage.removeItem("user");
+  }, [user]);
+
+  const saveAuth = ({ token, user }) => {
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(user));
+    setUser(user);
+  };
+
+  const logout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    setUser(null);
+    navigate("/login");
+  };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading }}>
+    <AuthContext.Provider value={{ user, setUser, saveAuth, logout }}>
       {children}
     </AuthContext.Provider>
   );
