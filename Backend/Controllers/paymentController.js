@@ -14,7 +14,7 @@ export const createPayment = async (req, res) => {
       amount,
       method,
       createdBy,
-      status: "Completed", // Default Completed, agar tum Pending chahte ho to change kar sakte ho
+      status: "Pending", // ✅ ab default Pending
     });
 
     // Step 2: Lead ke andar payment push karo

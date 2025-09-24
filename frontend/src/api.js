@@ -9,9 +9,9 @@ export const getNotifications = async (token) => {
 };
 
 export const markNotificationAsRead = async (id, token) => {
-  const res = await fetch(`${API}/notifications/${id}/read`, {
+  const res = await fetch(`${API_URL}/notifications/${id}/read`, {
     method: "PUT",
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${token}` }
   });
   return res.json();
 };

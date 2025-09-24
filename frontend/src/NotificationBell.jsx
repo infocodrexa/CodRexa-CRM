@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import { getNotifications, markNotificationAsRead } from "./api";
 
-const API_BASE = import.meta.env.VITE_API_URL.replace("/api", "");
-const socket = io(API_BASE, { transports: ["websocket"] });
+const API_BASE = import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000";
+const socket = io(API_BASE, { transports: ["websocket", "polling"] });
 
 const NotificationBell = ({ userId, token }) => {
   const [notifications, setNotifications] = useState([]);
@@ -11,7 +11,8 @@ const NotificationBell = ({ userId, token }) => {
   const [open, setOpen] = useState(false);
 
   const fetchNotifications = async () => {
-    const data = await getNotifications(token);
+    if (!userId) return;
+    const data = await getNotifications(token, userId);
     const notifs = data.notifications || [];
     setNotifications(notifs);
     setUnreadCount(notifs.filter(n => !n.isRead).length);
@@ -30,13 +31,14 @@ const NotificationBell = ({ userId, token }) => {
 
     if (userId) {
       socket.emit("joinRoom", userId);
-      socket.on("receiveNotification", (n) => {
+      const handler = (n) => {
         setNotifications(prev => [{ ...n, isRead: false }, ...prev]);
         setUnreadCount(prev => prev + 1);
-      });
-    }
+      };
+      socket.on("receiveNotification", handler);
 
-    return () => socket.off("receiveNotification");
+      return () => socket.off("receiveNotification", handler);
+    }
   }, [userId]);
 
   return (

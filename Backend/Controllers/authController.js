@@ -107,7 +107,6 @@ export const loginStep1 = async (req, res) => {
       ],
     });
 
-
     if (!user) return res.status(404).json({ message: "User not found" });
 
     if (isBlocked(user))
@@ -130,7 +129,13 @@ export const loginStep1 = async (req, res) => {
 
     // generate OTP
     const otp = generateOTP();
-    user.otp = otp;
+    console.log("Generated OTP (for dev only):", otp);
+
+    const salt = await bcrypt.genSalt(10);
+    user.otp = await bcrypt.hash(otp, salt);
+
+    // user.otp = otp;
+
     user.otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 min
     user.otpAttempts = 0;
 
@@ -143,7 +148,7 @@ export const loginStep1 = async (req, res) => {
       html: otpTemplate(user.username, otp),
     });
 
-    console.log("User object before response:", user);
+    // console.log("User object before response:", user);
 
     return res.json({ message: "OTP sent to email", userId: user._id });
   } catch (err) {
@@ -158,7 +163,7 @@ export const loginStep1 = async (req, res) => {
 export const verifyOTP = async (req, res) => {
   try {
     const { userId, otp } = req.body;
-    console.log(req.body);
+    // console.log(req.body);
     if (!userId || !otp)
       return res.status(400).json({ message: "userId and otp required" });
 
@@ -176,14 +181,25 @@ export const verifyOTP = async (req, res) => {
         .json({ message: "OTP expired. Please login again." });
     }
 
-    if (user.otp !== otp) {
-      user.otpAttempts = (user.otpAttempts || 0) + 1;
-      if (user.otpAttempts >= 5) {
-        user.blockedUntil = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const validOTP = await bcrypt.compare(otp, user.otp);
+      if (!validOTP) {
+          user.otpAttempts = (user.otpAttempts || 0) + 1;
+          if (user.otpAttempts >= 5) {
+              user.blockedUntil = new Date(Date.now() + 24 * 60 * 60 * 1000);
+          }
+          await user.save();
+          return res.status(400).json({ message: "Invalid OTP" });
       }
-      await user.save();
-      return res.status(400).json({ message: "Invalid OTP" });
-    }
+
+
+    // if (user.otp !== otp) {
+    //   user.otpAttempts = (user.otpAttempts || 0) + 1;
+    //   if (user.otpAttempts >= 5) {
+    //     user.blockedUntil = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    //   }
+    //   await user.save();
+    //   return res.status(400).json({ message: "Invalid OTP" });
+    // }
 
     // OTP correct
     user.otp = null;
@@ -347,8 +363,9 @@ export const logout = async (req, res) => {
 
 // Recursive function to build children
 const buildChildTree = async (parentId) => {
-  const children = await User.find({ createdBy: parentId })
-    .select("name username email role createdBy");
+  const children = await User.find({ createdBy: parentId }).select(
+    "name username email role createdBy"
+  );
 
   const tree = [];
   for (const child of children) {
@@ -375,8 +392,9 @@ export const getUserTree = async (req, res) => {
     }
 
     // Find root user
-    const user = await User.findById(id)
-      .select("name username email role createdBy");
+    const user = await User.findById(id).select(
+      "name username email role createdBy"
+    );
 
     if (!user) return res.status(404).json({ message: "User not found" });
 
@@ -402,8 +420,8 @@ export const getUserTree = async (req, res) => {
 // 🔹 Delete user (Admin + Developer only)
 export const deleteUser = async (req, res) => {
   try {
-    const requester = req.user;   // jo request bhej raha hai
-    const { id } = req.params;    // jis user ko delete karna hai
+    const requester = req.user; // jo request bhej raha hai
+    const { id } = req.params; // jis user ko delete karna hai
 
     // Target user dhoondo
     const targetUser = await User.findById(id);
@@ -413,7 +431,9 @@ export const deleteUser = async (req, res) => {
 
     // ❌ Koi bhi apna khud ka account delete na kar sake
     if (requester._id.toString() === targetUser._id.toString()) {
-      return res.status(403).json({ message: "You cannot delete your own account" });
+      return res
+        .status(403)
+        .json({ message: "You cannot delete your own account" });
     }
 
     // 🔹 Developer → sabko delete kar sakta hai (except self)
@@ -430,17 +450,20 @@ export const deleteUser = async (req, res) => {
       } else {
         return res
           .status(403)
-          .json({ message: "Admin can only delete users, not Admins or Developers" });
+          .json({
+            message: "Admin can only delete users, not Admins or Developers",
+          });
       }
     }
 
     // 🔹 User → delete ka access hi nahi
-    return res.status(403).json({ message: "Users are not allowed to delete accounts" });
+    return res
+      .status(403)
+      .json({ message: "Users are not allowed to delete accounts" });
   } catch (error) {
     res.status(500).json({ message: "Server Error", error: error.message });
   }
 };
-
 
 // 🔹 Update user (Admin + Developer only)
 export const updateUser = async (req, res) => {
@@ -457,19 +480,25 @@ export const updateUser = async (req, res) => {
 
     // ✅ Sirf Developer ya Admin update kar sake
     if (loggedRole !== "developer" && loggedRole !== "admin") {
-      return res.status(403).json({ message: "Not authorized to update users" });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to update users" });
     }
 
     // ❌ Apna khud ka role change na kare
     if (req.user._id.toString() === id && role && role !== user.role) {
-      return res.status(403).json({ message: "You cannot change your own role" });
+      return res
+        .status(403)
+        .json({ message: "You cannot change your own role" });
     }
 
     // ✅ Agar Admin hai → sirf apne se niche wale ko update kar sake
     if (loggedRole === "admin") {
       const allowedRoles = ["manager", "user"]; // admin sirf inko update kar sake
       if (!allowedRoles.includes(user.role.toLowerCase())) {
-        return res.status(403).json({ message: "Admin cannot update this user" });
+        return res
+          .status(403)
+          .json({ message: "Admin cannot update this user" });
       }
     }
 
@@ -496,24 +525,24 @@ export const updateUser = async (req, res) => {
     });
   } catch (err) {
     console.error(err);
-    return res.status(500).json({ message: "Server error", error: err.message });
+    return res
+      .status(500)
+      .json({ message: "Server error", error: err.message });
   }
 };
-
-
 
 // Get users with specific roles
 export const getAssignableUsers = async (req, res) => {
   try {
-    const users = await User.find({ role: { $in: ["developer", "admin", "manager"] } })
-      .select("name email role");
+    const users = await User.find({
+      role: { $in: ["developer", "admin", "manager"] },
+    }).select("name email role");
 
     res.status(200).json({
       success: true,
-      users
+      users,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-

@@ -1,45 +1,44 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
-import OtpVerify from "./pages/OtpVerify";
-import Dashboard from "./pages/Dashboard";
-import Forbidden from "./pages/Forbidden";
-import ForgotPassword from "./pages/ForgotPassword";
-import ResetPassword from "./pages/ResetPassword";
+import React from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "./pages/LoginPage";
+import VerifyOTPPage from "./pages/VerifyOTPPage";
+import DashboardLayout from "./components/DashboardLayout";
+import HomePage from "./pages/HomePage";
+import UsersPage from "./pages/UsersPage";
+import PropertiesPage from "./pages/PropertiesPage";
+import NotesPage from "./pages/NotesPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NotificationBell from "./NotificationBell";
 
-function App() {
+export default function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <Routes>
-          {/* <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/otp-verify" element={<OtpVerify />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} /> */}
+    <Routes>
+      <Route path="/" element={<Navigate to="/dashboard" />} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/verify-otp" element={<VerifyOTPPage />} />
 
-          {/* Protected route with role-based access */}
-          {/* <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute role={["Developer", "Admin", "Manager", "User"]}>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          /> */}
+      <Route
+        path="/dashboard/*"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<HomePage />} />
+        <Route
+          path="users"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "manager"]}>
+              <UsersPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route path="properties" element={<PropertiesPage />} />
+        <Route path="notes" element={<NotesPage />} />
+      </Route>
 
-          {/* <Route path="/forbidden" element={<Forbidden />} />
-          <Route path="/notification" element={<NotificationBell />} /> */}
-
-          <div>Helo world</div>
-
-        </Routes>
-      </Router>
-    </AuthProvider>
+      <Route path="*" element={<div className="p-4">404 - Not found</div>} />
+    </Routes>
   );
 }
-
-export default App;

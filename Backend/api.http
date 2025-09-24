@@ -42,7 +42,7 @@ POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-  "identifier": "abhishek123",
+  "identifier": "ram123",
   "password": "Password@123"
 }
 
@@ -73,8 +73,8 @@ POST http://localhost:5000/api/auth/verify-otp
 Content-Type: application/json
 
 {
-  "userId": "68bdcf4c6f741a139ee4e0b4", 
-  "otp": "936571"
+  "userId": "68c322b374d6f1cd5a930caa", 
+  "otp": "731949"
 }
 
 # Response me milega accessToken + refresh cookie
