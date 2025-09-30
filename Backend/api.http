@@ -73,8 +73,8 @@ POST http://localhost:5000/api/auth/verify-otp
 Content-Type: application/json
 
 {
-  "userId": "68c322b374d6f1cd5a930caa", 
-  "otp": "731949"
+  "userId": "68bd47bb0f82b2c10a7363f2", 
+  "otp": "451297"
 }
 
 # Response me milega accessToken + refresh cookie

@@ -88,4 +88,5 @@ const server = http.createServer(app);
 // Initialize Socket.io
 export const io = initSocket(server);
 
-app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`));
+// app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`));
+server.listen(PORT, () => console.log(`🚀 Server running on ${PORT} with Socket.io`));

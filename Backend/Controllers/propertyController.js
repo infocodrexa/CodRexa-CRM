@@ -13,7 +13,7 @@ export const addProperty = async (req, res) => {
     const newProperty = new Property({
       ...req.body,
       images: imagePaths,          // images ka array DB me save hoga
-      createdBy: req.user._id,     // logged-in user ka ID
+      user: req.user._id,     // logged-in user ka ID
     });
 
     await newProperty.save();

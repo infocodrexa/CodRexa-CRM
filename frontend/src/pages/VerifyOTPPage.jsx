@@ -10,19 +10,29 @@ export default function VerifyOTPPage() {
   const { saveAuth } = useContext(AuthContext);
 
   const handleVerify = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const userId = localStorage.getItem("loginUserId"); // userId from step 1
-      const res = await API.post("/auth/verify-otp", { userId, otp });
-      saveAuth(res.data); // save accessToken + user info
-      navigate("/dashboard"); // redirect to dashboard
-    } catch (err) {
-      alert(err?.response?.data?.message || "OTP verification failed");
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+  setLoading(true);
+  try {
+    const userId = localStorage.getItem("loginUserId"); // userId from step 1
+    const res = await API.post("/auth/verify-otp", { userId, otp });
+
+    saveAuth({
+      token: res.data.accessToken,
+      user: res.data.user,
+    });
+
+    console.log("Login response:", res.data);
+    console.log("Token saved:", localStorage.getItem("token"));
+
+    navigate("/dashboard"); // redirect to dashboard
+  } catch (err) {
+    console.error("OTP verification failed:", err.response?.data || err);
+    alert(err?.response?.data?.message || "OTP verification failed");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="d-flex vh-100 align-items-center justify-content-center bg-light">

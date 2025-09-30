@@ -19,9 +19,18 @@ export const AuthProvider = ({ children }) => {
   }, [user]);
 
   const saveAuth = ({ token, user }) => {
+    console.log("Saving token to localStorage:", token, "user:", user);
+
+    // Ensure user has _id and role
+    const safeUser = {
+      _id: user._id || user.id,
+      username: user.username,
+      role: user.role || "user",
+    };
+
     localStorage.setItem("token", token);
-    localStorage.setItem("user", JSON.stringify(user));
-    setUser(user);
+    localStorage.setItem("user", JSON.stringify(safeUser));
+    setUser(safeUser);
   };
 
   const logout = () => {

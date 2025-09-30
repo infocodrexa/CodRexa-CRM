@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { io } from "socket.io-client";
-import { getNotifications, markNotificationAsRead } from "./api";
+import { getNotifications, markNotificationAsRead } from "./utils/api";
 
 const API_BASE = import.meta.env.VITE_API_URL?.replace("/api", "") || "http://localhost:5000";
 const socket = io(API_BASE, { transports: ["websocket", "polling"] });

@@ -6,12 +6,12 @@ import {
   markAsRead, 
   deleteNotification 
 } from "../Controllers/notificationController.js";
-import { protect } from "../middleware/authMiddleware.js";
+import { protect } from "../Middleware/authMiddleware.js";
 
 const router = express.Router();
 
 // Create a notification
-router.post("/", protect, createSimpleNotification,);
+router.post("/", protect, createSimpleNotification);
 
 // Get logged-in user's notifications
 router.get("/", protect, getUserNotifications);
