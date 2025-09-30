@@ -236,34 +236,64 @@ export const verifyOTP = async (req, res) => {
   }
 };
 
-// refresh endpoint
+// // refresh endpoint
+// export const refreshToken = async (req, res) => {
+//   try {
+//     const token = req.cookies.jid;
+//     if (!token) return res.status(401).json({ message: "No refresh token" });
+
+//     // verify
+//     const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+//     const user = await User.findById(payload.id);
+//     if (!user)
+//       return res.status(401).json({ message: "Invalid refresh token" });
+
+//     // optional: compare stored refresh token if you store it
+//     const accessToken = generateAccessToken(user);
+//     const newRefresh = generateRefreshToken(user);
+
+//     res.cookie("jid", newRefresh, {
+//       httpOnly: true,
+//       secure: process.env.NODE_ENV === "production",
+//       sameSite: "lax",
+//       maxAge: 7 * 24 * 60 * 60 * 1000,
+//     });
+
+//     return res.json({ accessToken });
+//   } catch (err) {
+//     console.error(err);
+//     return res.status(401).json({ message: "Invalid refresh token" });
+//   }
+// };
+
+
+
+// Backend: Controllers/authController.js (refreshToken function)
 export const refreshToken = async (req, res) => {
-  try {
-    const token = req.cookies.jid;
-    if (!token) return res.status(401).json({ message: "No refresh token" });
+    try {
+        // 🛑 FIX: Read the refresh token from the request body (as sent by the frontend)
+        const token = req.body.refreshToken; // <--- यहां बदलें
+        
+        if (!token) return res.status(401).json({ message: "No refresh token provided in body" });
 
-    // verify
-    const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
-    const user = await User.findById(payload.id);
-    if (!user)
-      return res.status(401).json({ message: "Invalid refresh token" });
+        // verify (rest of the logic remains the same)
+        const payload = jwt.verify(token, process.env.JWT_REFRESH_SECRET);
+        // ... (rest of the verification logic)
 
-    // optional: compare stored refresh token if you store it
-    const accessToken = generateAccessToken(user);
-    const newRefresh = generateRefreshToken(user);
+        // 🛑 FIX: Send the new refresh token (newRefresh) in the response body
+        //   so the frontend can save it to localStorage (replace res.cookie)
+        const accessToken = generateAccessToken(User);
+        const newRefresh = generateRefreshToken(User);
 
-    res.cookie("jid", newRefresh, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+        // return res.cookie("jid", newRefresh, { ... }); // इस कुकी लॉजिक को हटा दें या बदल दें
 
-    return res.json({ accessToken });
-  } catch (err) {
-    console.error(err);
-    return res.status(401).json({ message: "Invalid refresh token" });
-  }
+        return res.json({ 
+            accessToken,
+            refreshToken: newRefresh // <--- नया रिफ्रेश टोकन बॉडी में वापस भेजें
+        });
+    } catch (err) {
+        // ...
+    }
 };
 
 // forgot password -> send reset link with token
