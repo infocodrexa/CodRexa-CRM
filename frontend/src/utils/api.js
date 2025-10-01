@@ -322,4 +322,14 @@ export const markNotificationAsRead = async (id) => {
   return res.data;
 };
 
+export const fetchNotesAPI = async () => {
+  const res = await API.get("/notes");
+  return res.data;
+};
+
+export const createNoteAPI = async (note) => {
+  const res = await API.post("/notes", note);
+  return res.data;
+};
+
 export default API;

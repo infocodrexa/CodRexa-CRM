@@ -70,6 +70,21 @@ export const updateNote = async (req, res) => {
 // =========================
 // ✅ DELETE NOTE (ONLY OWNER)
 // =========================
+// export const deleteNote = async (req, res) => {
+//   try {
+//     const note = await Note.findById(req.params.id);
+//     if (!note) return res.status(404).json({ message: "Note not found" });
+//     if (note.user.toString() !== req.user.id)
+//       return res.status(403).json({ message: "❌ Not authorized to delete this note" });
+
+//     await note.remove();
+//     res.json({ message: "✅ Note deleted!" });
+//   } catch (error) {
+//     console.error("❌ Error deleting note:", error);
+//     res.status(500).json({ message: "Error deleting note", error });
+//   }
+// };
+
 export const deleteNote = async (req, res) => {
   try {
     const note = await Note.findById(req.params.id);
@@ -77,8 +92,8 @@ export const deleteNote = async (req, res) => {
     if (note.user.toString() !== req.user.id)
       return res.status(403).json({ message: "❌ Not authorized to delete this note" });
 
-    await note.remove();
-    res.json({ message: "✅ Note deleted!" });
+    await note.deleteOne();
+    res.json({ message: "✅ Note deleted!", id: req.params.id });
   } catch (error) {
     console.error("❌ Error deleting note:", error);
     res.status(500).json({ message: "Error deleting note", error });
