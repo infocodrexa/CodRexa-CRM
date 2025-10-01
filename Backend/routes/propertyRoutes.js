@@ -6,7 +6,8 @@ import {
   updateProperty,
   deleteProperty,
   addPlotToProperty,
-  updatePlotInProperty,     // ✅ import
+  updatePlotInProperty,
+  deletePlotInProperty,     // ✅ import
 } from "../Controllers/propertyController.js";
 
 import { protect } from "../Middleware/authMiddleware.js";
@@ -30,6 +31,8 @@ router.post("/:id/plots", protect, addPlotToProperty);
 
 // ✏ Update plot (sirf Admin/Developer)
 router.put("/:id/plots/:plotId", protect, propertyPermission("canUpdate"), updatePlotInProperty);
+
+router.delete("/:id/plots/:plotId", protect, propertyPermission("canDelete"), deletePlotInProperty);
 
 // 📋 Get all properties (sab logged-in user kar sakte hain)
 router.get("/", protect, getAllProperties);

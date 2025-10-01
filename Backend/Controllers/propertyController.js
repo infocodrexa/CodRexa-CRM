@@ -168,3 +168,40 @@ export const updatePlotInProperty = async (req, res) => {
     });
   }
 };
+
+
+// 🗑️ Delete Plot from a Property
+export const deletePlotInProperty = async (req, res) => {
+  try {
+    const { id, plotId } = req.params; // propertyId & plotId
+
+    // Step 1: Find the parent property
+    const property = await Property.findById(id);
+    if (!property) {
+      return res.status(404).json({ message: "Property not found" });
+    }
+
+    // Step 2: Find the specific plot within the property
+    const plot = property.plots.id(plotId);
+    if (!plot) {
+      return res.status(404).json({ message: "Plot not found" });
+    }
+
+    // Step 3: Remove the plot from the array
+    // Mongoose 5.11+ mein remove() ki jagah deleteOne() use karein
+    await plot.deleteOne();
+
+    // Step 4: Save the parent property to persist the change
+    await property.save();
+
+    res.status(200).json({
+      message: "Plot deleted successfully",
+      property, // Return the updated property
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Error deleting plot",
+      error: error.message,
+    });
+  }
+};

@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
+import listEndpoints from 'express-list-endpoints';
 import cors from "cors";
 import http from "http";
 import connectDB from "./config/db.js";
@@ -88,5 +89,9 @@ const server = http.createServer(app);
 // Initialize Socket.io
 export const io = initSocket(server);
 
+
+console.log("--- REGISTERED ROUTES ---");
+console.log(listEndpoints(app));
+console.log("-------------------------");
 // app.listen(PORT, () => console.log(`🚀 Server running on ${PORT}`));
 server.listen(PORT, () => console.log(`🚀 Server running on ${PORT} with Socket.io`));
